@@ -1,5 +1,10 @@
 package kma;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+
+import java.util.stream.Stream;
 import org.junit.jupiter.api.Assumptions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -11,12 +16,6 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.ValueSource;
 import ua.edu.kma.RentalPriceService;
-
-import java.util.stream.Stream;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class RentalPriceServiceTest {
 
@@ -44,12 +43,7 @@ class RentalPriceServiceTest {
     }
 
     @ParameterizedTest
-    @CsvSource({
-            "1, 50.0",
-            "7, 350.0",
-            "8, 360.0",
-            "10, 450.0"
-    })
+    @CsvSource({"1, 50.0", "7, 350.0", "8, 360.0", "10, 450.0"})
     @Tag("fast")
     @DisplayName("Price calculation with discounts applied")
     void calculatePrice_ShouldApplyDiscountCorrectly(int days, double expectedPrice) {
@@ -62,16 +56,15 @@ class RentalPriceServiceTest {
     Stream<DynamicTest> testAvailableClasses() {
         return service.getAvailableClasses().stream()
                 .map(carClass -> DynamicTest.dynamicTest(
-                        "Car class " + carClass + " is valid",
-                        () -> assertFalse(carClass.isEmpty())
-                ));
+                        "Car class " + carClass + " is valid", () -> assertFalse(carClass.isEmpty())));
     }
 
     @Test
     @Tag("fast")
     @DisplayName("Price calculation for Premium cars (if available in the car park)")
     void calculatePrice_ShouldRunOnlyIfPremiumAvailable() {
-        Assumptions.assumeTrue(service.getAvailableClasses().contains("Premium"),
+        Assumptions.assumeTrue(
+                service.getAvailableClasses().contains("Premium"),
                 "Test skipped: Premium class is currently removed from the car park");
 
         double expectedPrice = 100.0;
@@ -79,5 +72,4 @@ class RentalPriceServiceTest {
 
         assertEquals(expectedPrice, actualPrice, "Price was calculated incorrectly");
     }
-
 }
